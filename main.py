@@ -1,69 +1,103 @@
-import numpy as np
+#include <iostream>
+#include <vector>
 
-def is_possible(grid, row, col, num):
-    # Check if 'num' is possible at the given position (row, col) in the grid
+using namespace std;
 
-    # Check row
-    for i in range(9):
-        if grid[row][i] == num:
-            return False
+bool isPossible(vector<vector<int>>& grid, int row, int col, int num) {
+    // Check if 'num' is possible at the given position (row, col) in the grid
 
-    # Check column
-    for i in range(9):
-        if grid[i][col] == num:
-            return False
+    // Check row
+    for (int i = 0; i < 9; ++i) {
+        if (grid[row][i] == num) {
+            return false;
+        }
+    }
 
-    # Check 3x3 square
-    start_row = (row // 3) * 3
-    start_col = (col // 3) * 3
-    for i in range(3):
-        for j in range(3):
-            if grid[start_row + i][start_col + j] == num:
-                return False
+    // Check column
+    for (int i = 0; i < 9; ++i) {
+        if (grid[i][col] == num) {
+            return false;
+        }
+    }
 
-    return True
+    // Check 3x3 square
+    int startRow = (row / 3) * 3;
+    int startCol = (col / 3) * 3;
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if (grid[startRow + i][startCol + j] == num) {
+                return false;
+            }
+        }
+    }
 
-def solve_sudoku(grid):
-    # Solve the Sudoku puzzle using backtracking
+    return true;
+}
 
-    for row in range(9):
-        for col in range(9):
-            if grid[row][col] == 0:  # Check for empty cell
-                for num in range(1, 10):
-                    if is_possible(grid, row, col, num):
-                        grid[row][col] = num  # Place the number in the empty cell
+bool solveSudoku(vector<vector<int>>& grid) {
+    // Solve the Sudoku puzzle using backtracking
 
-                        if solve_sudoku(grid):  # Recursively solve the remaining grid
-                            return True
+    for (int row = 0; row < 9; ++row) {
+        for (int col = 0; col < 9; ++col) {
+            if (grid[row][col] == 0) { // Check for empty cell
+                for (int num = 1; num <= 9; ++num) {
+                    if (isPossible(grid, row, col, num)) {
+                        grid[row][col] = num; // Place the number in the empty cell
 
-                        grid[row][col] = 0  # Backtrack if the solution is not valid
+                        if (solveSudoku(grid)) { // Recursively solve the remaining grid
+                            return true;
+                        }
 
-                return False
+                        grid[row][col] = 0; // Backtrack if the solution is not valid
+                    }
+                }
 
-    return True  # Puzzle solved
+                return false;
+            }
+        }
+    }
 
-def print_sudoku(grid):
-    # Print the Sudoku grid in a visually appealing format
+    return true; // Puzzle solved
+}
 
-    for i in range(9):
-        if i % 3 == 0 and i != 0:
-            print("---------------------")
+void printSudoku(const vector<vector<int>>& grid) {
+    // Print the Sudoku grid in a visually appealing format
 
-        for j in range(9):
-            if j % 3 == 0 and j != 0:
-                print("|", end=" ")
-            
-            if j == 8:
-                print(grid[i][j])
-            else:
-                print(grid[i][j], end=" ")
+    for (int i = 0; i < 9; ++i) {
+        if (i % 3 == 0 && i != 0) {
+            cout << "---------------------" << endl;
+        }
 
-# Get user input for the Sudoku grid
-print("Enter the Sudoku grid (9 rows, each row containing 9 digits, use 0 for empty cells):")
-grid = []
-for _ in range(9):
-    row = list(map(int, input().split()))
-    grid.append(row)
+        for (int j = 0; j < 9; ++j) {
+            if (j % 3 == 0 && j != 0) {
+                cout << "| ";
+            }
 
-solve_sudoku(grid)
-print_sudoku(grid)
+            if (j == 8) {
+                cout << grid[i][j] << endl;
+            } else {
+                cout << grid[i][j] << " ";
+            }
+        }
+    }
+}
+
+int main() {
+    // Get user input for the Sudoku grid
+    cout << "Enter the Sudoku grid (9 rows, each row containing 9 digits, use 0 for empty cells):" << endl;
+    vector<vector<int>> grid(9, vector<int>(9));
+
+    for (int i = 0; i < 9; ++i) {
+        for (int j = 0; j < 9; ++j) {
+            cin >> grid[i][j];
+        }
+    }
+
+    if (solveSudoku(grid)) {
+        printSudoku(grid);
+    } else {
+        cout << "No solution exists." << endl;
+    }
+
+    return 0;
+}
